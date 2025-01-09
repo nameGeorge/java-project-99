@@ -1,13 +1,27 @@
+run-dist:
+	./build/install/app/bin/app
+
+start:
+	./gradlew bootRun --args='--spring.profiles.active=dev'
+
+start-prod:
+	./gradlew bootRun --args='--spring.profiles.active=prod'
+
 build:
-	./gradlew clean build
+	./gradlew build
+
+clean:
+	./gradlew clean
+
+test:
+	./gradlew test
 
 report:
 	./gradlew jacocoTestReport
 
-install-dist:
-	./gradlew clean installDist
+lint:
+	./gradlew checkstyleMain checkstyleTest
 
-start-dist:
-	./build/install/app/bin/app
+build-run: build run
 
 .PHONY: build
