@@ -1,11 +1,9 @@
-FROM gradle:8.5.0-jdk21
+FROM gradle:8.7-jdk21
 
 WORKDIR /
 
 COPY / .
 
-RUN gradle installDist
+RUN ./gradlew --no-daemon build
 
-EXPOSE 8080
-
-CMD ./build/install/app/bin/app --spring.profiles.active=prod
+CMD java -jar build/libs/app-0.0.1-SNAPSHOT.jar --spring.profiles.active=production
