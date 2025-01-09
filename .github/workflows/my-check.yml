@@ -15,7 +15,7 @@ jobs:
         with:
           arguments: build
           build-root-directory: app
-          gradle-version: 8.9
+          gradle-version: 8.7
       - run: make lint
       - run: make test
       - name: Publish code coverage
