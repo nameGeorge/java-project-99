@@ -2,8 +2,8 @@ plugins {
 	application
 	checkstyle
 	jacoco
-	id("org.springframework.boot") version "3.3.7"
-	id("io.spring.dependency-management") version "1.1.7"
+	id("org.springframework.boot") version "3.3.2"
+	id("io.spring.dependency-management") version "1.1.6"
 	id("io.freefair.lombok") version "8.6"
 }
 
@@ -44,6 +44,9 @@ dependencies {
 
 	implementation("net.datafaker:datafaker:2.0.1")
 	implementation("org.instancio:instancio-junit:3.3.0")
+
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+
 
 
 
