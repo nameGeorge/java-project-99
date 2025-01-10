@@ -1,6 +1,7 @@
 package hexlet.code.util;
 
 import hexlet.code.model.User;
+
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import net.datafaker.Faker;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ModelGenerator {
     private Model<User> userModel;
+
+
     @Autowired
     private Faker faker;
 

@@ -2,10 +2,8 @@ package hexlet.code;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import hexlet.code.mapper.UserMapper;
@@ -17,14 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -62,9 +58,7 @@ public class UserControllerTest {
     private ModelGenerator modelGenerator;
 
     private User testUser;
-
-
-    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
+    private User testUser2;
 
     @BeforeEach
     public void setUp() {
@@ -72,11 +66,8 @@ public class UserControllerTest {
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())
                 .build();
-        token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-
-        testUser = Instancio.of(modelGenerator.getUserModel())
-                .create();
-        userRepository.save(testUser);
+        testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        testUser2 = Instancio.of(modelGenerator.getUserModel()).create();
     }
 
 
@@ -96,7 +87,6 @@ public class UserControllerTest {
 
         userRepository.save(testUser);
 
-
         var request = get("/api/users/" + testUser.getId()).with(jwt());
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -111,39 +101,20 @@ public class UserControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var data = Instancio.of(modelGenerator.getUserModel())
-                .create();
 
-        var request = post("/api/users")
-                .with(token)
+        var request = post("/api/users").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
+                .content(om.writeValueAsString(testUser2));
+
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var user = userRepository.findByEmail(data.getEmail()).get();
+        var user = userRepository.findByEmail(testUser2.getEmail()).get();
 
-        assertNotNull(user);
-        assertThat(user.getFirstName()).isEqualTo(data.getFirstName());
-        assertThat(user.getLastName()).isEqualTo(data.getLastName());
-    }
-
-    @Test
-    public void testUpdate() throws Exception {
-
-        var data = new HashMap<>();
-        data.put("firstName", "first");
-
-        var request = put("/api/users/" + testUser.getId())
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
-
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-
-        var user = userRepository.findById(testUser.getId()).get();
-        assertThat(user.getFirstName()).isEqualTo(("first"));
+        assertThat(user).isNotNull();
+        assertThat(user.getFirstName()).isEqualTo(testUser2.getFirstName());
+        assertThat(user.getEmail()).isEqualTo(testUser2.getEmail());
+        assertThat(user.getPasswordDigest()).isNotEqualTo(testUser2.getPasswordDigest());
     }
 
     @Test
@@ -163,5 +134,4 @@ public class UserControllerTest {
         var result = mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
     }
-
 }

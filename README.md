@@ -1,7 +1,7 @@
 ### Hexlet tests and linter status:
-[![Actions Status](https://github.com/nameGeorge/java-project-99/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/nameGeorge/java-project-99/actions)
-[![Java CI](https://github.com/nameGeorge/java-project-99/actions/workflows/my-check.yml/badge.svg)](https://github.com/nameGeorge/java-project-99/actions/workflows/my-check.yml)
+[![Actions Status](https://github.com/Ksandra91/java-project-99/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Ksandra91/java-project-99/actions)
+[![Maintainability](https://api.codeclimate.com/v1/badges/866ace04398cb7c4b9b6/maintainability)](https://codeclimate.com/github/Ksandra91/java-project-99/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/866ace04398cb7c4b9b6/test_coverage)](https://codeclimate.com/github/Ksandra91/java-project-99/test_coverage)
+[![Java CI](https://github.com/Ksandra91/java-project-99/actions/workflows/main.yml/badge.svg)](https://github.com/Ksandra91/java-project-99/actions/workflows/main.yml)
 
-### Maintainability and Test coverage:
-<a href="https://codeclimate.com/github/nameGeorge/java-project-99/maintainability"><img src="https://api.codeclimate.com/v1/badges/b9cf179f38c80e7a7aab/maintainability" /></a>
-<a href="https://codeclimate.com/github/nameGeorge/java-project-99/test_coverage"><img src="https://api.codeclimate.com/v1/badges/b9cf179f38c80e7a7aab/test_coverage" /></a>
+### [Link](https://task-manager-wbcw.onrender.com)

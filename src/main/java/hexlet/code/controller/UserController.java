@@ -26,6 +26,7 @@ import jakarta.validation.Valid;
 public class UserController {
     @Autowired
     private UserRepository repository;
+
     @Autowired
     private UserMapper postMapper;
 
@@ -36,6 +37,7 @@ public class UserController {
         var result = users.stream()
                 .map(postMapper::map)
                 .toList();
+
         return result;
     }
 

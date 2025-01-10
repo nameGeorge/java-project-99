@@ -21,9 +21,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
-
-//    @ExceptionHandler(UnsupportedOperationException.class)
-//    public ResponseEntity<String> handleUnsupportedOperationException(UnsupportedOperationException ex) {
-//        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-//    }
 }
