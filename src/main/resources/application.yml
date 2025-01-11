@@ -12,5 +12,3 @@ spring:
       enabled: always
   profiles:
     default: dev
-    h2:
-      console.enabled: true
