@@ -1,24 +1,11 @@
-.DEFAULT_GOAL := build-run
-
-clean:
-	./gradlew clean
-
 build:
 	./gradlew clean build
 
 install:
-	./gradlew clean install
+	./gradlew installDist
 
-start-dev:
-	./gradlew bootRun --args='--spring.profiles.active=dev'
-
-#install:
-#	./gradlew installDist
-#run-dist:
-#	./build/install/app/bin/app
-
-#run:
-#	./gradlew run
+run-dist:
+	./build/install/app/bin/app
 
 lint:
 	./gradlew checkstyleMain checkstyleTest
@@ -27,8 +14,6 @@ test:
 	./gradlew test
 
 report:
-	./gradlew jacocoTestCoverage jacocoTestReport
-
-build-run: build run
+	./gradlew jacocoTestReport
 
 .PHONY: build
