@@ -9,7 +9,7 @@ import hexlet.code.dto.Task.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import hexlet.code.exception.ResourceNotFoundException;
@@ -27,18 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/tasks")
 public class TaskController {
-    @Autowired
-    private TaskRepository repository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
+    private final TaskRepository repository;
+    private final UserRepository userRepository;
     private TaskMapper taskMapper;
-
-    @Autowired
     private TaskSpecification taskSpecification;
 
     @GetMapping("")
@@ -53,15 +47,11 @@ public class TaskController {
                 .body(result);
     }
 
+
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskDTO create(@Valid @RequestBody TaskCreateDTO taskData) {
         var task = taskMapper.map(taskData);
-        var asID = taskData.getAssigneeId();
-        var as = userRepository.findById(asID).get();
-        task.setAssignee(as);
-        repository.save(task);
-        userRepository.save(as);
         repository.save(task);
         var taskDTO = taskMapper.map(task);
         return taskDTO;
@@ -82,11 +72,6 @@ public class TaskController {
         var task = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Not Found: " + id));
         taskMapper.update(taskData, task);
-//        taskMapper.update(taskData, task);
-//        var asID = taskData.getAssigneeId().get();
-//        var as = userRepository.findById(asID).get();
-//        task.setAssignee(as);
-//        taskRepository.save(task);
         repository.save(task);
         var taskDTO = taskMapper.map(task);
         return taskDTO;
@@ -97,4 +82,6 @@ public class TaskController {
     public void delete(@PathVariable Long id) {
         repository.deleteById(id);
     }
+
+
 }

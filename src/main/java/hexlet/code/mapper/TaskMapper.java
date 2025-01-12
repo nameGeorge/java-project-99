@@ -7,21 +7,22 @@ import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
-import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
+
 
 @Mapper(
         uses = {JsonNullableMapper.class, ReferenceMapper.class},
@@ -29,57 +30,62 @@ import java.util.stream.Collectors;
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-
 public abstract class TaskMapper {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TaskStatusRepository statusRepository;
+    private TaskStatusRepository taskStatusRepository;
 
     @Autowired
     private LabelRepository labelRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "status", target = "taskStatus", qualifiedByName = "statusSlug")
-    @Mapping(source = "assigneeId", target = "assignee.id")
-    @Mapping(source = "labelsId", target = "labels", qualifiedByName = "labels")
+    @Mapping(source = "status", target = "taskStatus", qualifiedByName = "slugToTaskStatus")
+    @Mapping(source = "assigneeId", target = "assignee")
+    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "labelIdsToLabels")
     public abstract Task map(TaskCreateDTO taskCreateDTO);
 
 
     @Mapping(source = "name", target = "title")
     @Mapping(source = "description", target = "content")
-    @Mapping(source = "assignee.id", target = "assigneeId")
     @Mapping(source = "taskStatus.slug", target = "status")
-    @Mapping(target = "labelsId", source = "labels", qualifiedByName = "labelsId")
+    @Mapping(source = "assignee.id", target = "assigneeId")
+    @Mapping(target = "taskLabelIds", source = "labels", qualifiedByName = "labelsToLabelsIds")
     public abstract TaskDTO map(Task task);
 
 
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
     @Mapping(source = "assigneeId", target = "assignee")
-    @Mapping(source = "status", target = "taskStatus")
-    @Mapping(source = "labelsId", target = "labels", qualifiedByName = "labels")
+    @Mapping(source = "status", target = "taskStatus", qualifiedByName = "slugToTaskStatus")
+    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "labelIdsToLabels")
     public abstract void update(TaskUpdateDTO taskUpdateDTO, @MappingTarget Task task);
 
-
-    @Named("statusSlug")
-    public TaskStatus statusSlugToModel(String slug) {
-        return statusRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found: " + slug));
+    @Named("slugToTaskStatus")
+    public TaskStatus slugToTaskStatus(String slug) {
+        return taskStatusRepository.findBySlug(slug).orElseThrow(
+                () -> new ResourceNotFoundException("TaskStatus with slug " + slug + " not found"));
     }
 
-    @Named("labels")
-    public List<Label> labelIdtoModel(List<Long> labelIds) {
-        return labelIds == null ? new ArrayList<>() : labelRepository.findAllById(labelIds);
+    @Named("labelIdsToLabels")
+    public Set<Label> labelIdToLabel(Set<Long> labelIds) {
+        Set<Label> labels = new HashSet<>();
+        if (labelIds.isEmpty()) {
+            return labels;
+        } else {
+            labels = labelRepository.findByIdIn(labelIds);
+        }
+        return labels;
     }
 
-    @Named("labelsId")
-    public List<Long> labelToLabelId(List<Label> labels) {
-        return labels == null ? new ArrayList<>() : labels.stream()
+    @Named("labelsToLabelsIds")
+    public Set<Long> labelToLabelId(Set<Label> labels) {
+        return labels == null ? new HashSet<>()
+                : labels.stream()
                 .map(Label::getId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

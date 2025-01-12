@@ -35,7 +35,6 @@ dependencies {
 	testImplementation(platform("org.junit:junit-bom:5.10.0"))
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-// Понадобится когда мы начнем работать с аутентификацией
 	testImplementation("org.springframework.security:spring-security-test")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -47,13 +46,16 @@ dependencies {
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
 
+	implementation("org.postgresql:postgresql:42.7.4")
+
+	implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
 
 
 
 
-}
 
-tasks.withType<Test> {
+	tasks.withType<Test> {
 	useJUnitPlatform()
 }
 application {
@@ -61,4 +63,10 @@ application {
 }
 
 
-tasks.jacocoTestReport { reports { xml.required.set(true) } }
+tasks.jacocoTestReport { reports { xml.required.set(true) } } }
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+}

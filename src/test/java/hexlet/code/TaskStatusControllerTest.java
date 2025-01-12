@@ -12,7 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.repository.LabelRepository;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelGenerator;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +55,18 @@ public class TaskStatusControllerTest {
     private TaskStatusMapper statusMapper;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private ModelGenerator modelGenerator;
+
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private TaskStatusRepository statusRepository;
+
+    @Autowired
+    private LabelRepository labelRepository;
     TaskStatus testStatus;
 
     @BeforeEach
@@ -61,13 +77,16 @@ public class TaskStatusControllerTest {
                 .build();
         testStatus = new TaskStatus();
         testStatus.setSlug("test");
-        testStatus.setName("t");
+        testStatus.setName("test");
         statusRepository.save(testStatus);
     }
 
     @AfterEach
     public void clean() {
+        taskRepository.deleteAll();
         statusRepository.deleteAll();
+        labelRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -109,7 +128,6 @@ public class TaskStatusControllerTest {
 
         assertNotNull(status);
         assertThat(status.getName()).isEqualTo(data.getName());
-
     }
 
     @Test
@@ -145,6 +163,10 @@ public class TaskStatusControllerTest {
                 .with(jwt());
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
+
+        Assertions.assertThat(statusRepository.existsById(test.getId())).isFalse();
+
     }
+
 
 }

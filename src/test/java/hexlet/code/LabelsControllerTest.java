@@ -12,6 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelGenerator;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,15 +39,31 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 @SpringBootTest
 @AutoConfigureMockMvc
+
 public class LabelsControllerTest {
     @Autowired
     private WebApplicationContext wac;
+
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper om;
+
     @Autowired
     private LabelMapper labelMapper;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private ModelGenerator modelGenerator;
+
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private TaskStatusRepository statusRepository;
+
     @Autowired
     private LabelRepository labelRepository;
     Label testLabel;
@@ -55,12 +76,16 @@ public class LabelsControllerTest {
                 .build();
         testLabel = new Label();
         testLabel.setName("test");
+
         labelRepository.save(testLabel);
     }
 
     @AfterEach
     public void clean() {
+        taskRepository.deleteAll();
+        statusRepository.deleteAll();
         labelRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -79,6 +104,7 @@ public class LabelsControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
+
         assertThatJson(body).and(
                 v -> v.node("name").isEqualTo(testLabel.getName())
         );
@@ -88,13 +114,16 @@ public class LabelsControllerTest {
     public void testCreate() throws Exception {
         var data = new Label();
         data.setName("test2");
+
         var request = post("/api/labels")
                 .with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
+
         var label = labelRepository.findByName(data.getName()).get();
+
         assertNotNull(label);
         assertThat(label.getName()).isEqualTo(data.getName());
     }
@@ -102,12 +131,15 @@ public class LabelsControllerTest {
     @Test
     public void testUpdate() throws Exception {
         Map data = Map.of("name", "updateName");
+
         var request = put("/api/labels/" + testLabel.getId())
                 .with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
+
         mockMvc.perform(request)
                 .andExpect(status().isOk());
+
         var status = labelRepository.findById(testLabel.getId()).get();
         assertThat(status.getName()).isEqualTo(("updateName"));
     }
@@ -122,10 +154,14 @@ public class LabelsControllerTest {
     public void testDelete() throws Exception {
         var test = new Label();
         test.setName("test4");
+
         labelRepository.save(test);
+
         var request = delete("/api/labels/" + test.getId())
                 .with(jwt());
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
+        Assertions.assertThat(labelRepository.existsById(test.getId())).isFalse();
     }
+
 }

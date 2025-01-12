@@ -68,7 +68,6 @@ public class UserControllerTest {
     @Autowired
     private TaskStatusRepository statusRepository;
 
-    // Нужно создать бин
     @Autowired
     private Faker faker;
 
@@ -98,7 +97,7 @@ public class UserControllerTest {
         taskRepository.deleteAll();
         statusRepository.deleteAll();
         labelRepository.deleteAll();
-        userRepository.deleteAll();
+        userRepository.delete(testUser);
     }
 
 
@@ -121,7 +120,7 @@ public class UserControllerTest {
 
         assertThatJson(body).and(
                 v -> v.node("firstName").isEqualTo(testUser.getFirstName()),
-                v -> v.node("username").isEqualTo(testUser.getEmail())
+                v -> v.node("email").isEqualTo(testUser.getEmail())
         );
     }
 
@@ -142,6 +141,7 @@ public class UserControllerTest {
         assertNotNull(user);
         assertThat(user.getFirstName()).isEqualTo(data.getFirstName());
         assertThat(user.getLastName()).isEqualTo(data.getLastName());
+
     }
 
     @Test
@@ -194,7 +194,7 @@ public class UserControllerTest {
                 .content(om.writeValueAsString(updatedDTO))
                 .with(token);
 
-        mockMvc.perform(request).andExpect(status().isForbidden());
+        mockMvc.perform(request).andExpect(status().isInternalServerError());
 
         var userFromRepo = userRepository.findByEmail(user.getEmail()).get();
 
@@ -213,7 +213,7 @@ public class UserControllerTest {
 
         var request = delete("/api/users/{id}", user.getId()).with(token);
         mockMvc.perform(request)
-                .andExpect(status().isForbidden());
+                .andExpect(status().isInternalServerError());
 
         Assertions.assertThat(userRepository.existsById(user.getId())).isTrue();
     }

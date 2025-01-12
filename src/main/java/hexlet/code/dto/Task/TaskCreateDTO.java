@@ -1,25 +1,34 @@
 package hexlet.code.dto.Task;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskCreateDTO {
 
-    @NotNull
+
+    private Integer index;
+
+    private long assigneeId;
+
+    @NotBlank
     private String title;
-    private int index;
+
     private String content;
+
     @NotNull
     private String status;
-    @JsonProperty("assignee_id")
-    private long assigneeId;
-    private List<Long> labelsId = new ArrayList<>();
+
+    private Set<Long> taskLabelIds;
 
 }

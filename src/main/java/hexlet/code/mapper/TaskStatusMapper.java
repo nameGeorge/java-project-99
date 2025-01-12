@@ -9,7 +9,6 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-//import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(
@@ -20,18 +19,6 @@ import org.mapstruct.MappingTarget;
 )
 
 public abstract class TaskStatusMapper {
-
-    // @Mapping(target = "author", source = "authorId")
-//    public abstract TaskStatus map(TaskStatusCreateDTO dto);
-//
-//    //@Mapping(source = "author.id", target = "authorId")
-//    public abstract TaskStatusDTO map(TaskStatus model);
-//
-//    //@Mapping(source = "authorId", target = "author.id")
-//    public abstract TaskStatus map(TaskStatusDTO model);
-//
-//    public abstract void update(TaskStatusUpdateDTO dto, @MappingTarget TaskStatus model);
-
     public abstract TaskStatus map(TaskStatusCreateDTO taskStatusCreateDTO);
 
     public abstract TaskStatusDTO map(TaskStatus taskStatus);

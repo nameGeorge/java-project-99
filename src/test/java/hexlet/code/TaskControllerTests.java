@@ -19,6 +19,7 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,8 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -99,12 +100,11 @@ public class TaskControllerTests {
         testLabel = new Label();
         testLabel.setName("testLabel");
         labelRepository.save(testLabel);
-
         testTask = new Task();
         testTask.setName("TaskName");
         testTask.setAssignee(testUser);
         testTask.setTaskStatus(testStatus);
-        testTask.setLabels(List.of(testLabel));
+        testTask.setLabels(Set.of(testLabel));
         taskRepository.save(testTask);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
     }
@@ -123,6 +123,7 @@ public class TaskControllerTests {
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
+        System.out.println(body);
         assertThatJson(body).isArray();
     }
 
@@ -166,12 +167,15 @@ public class TaskControllerTests {
         Label testLabel2 = new Label();
         testLabel2.setName("testLabel1111111");
         labelRepository.save(testLabel2);
+        Label testLabel3 = new Label();
+        testLabel3.setName("testLabel2222222222");
+        labelRepository.save(testLabel3);
 
         TaskCreateDTO testTask2 = new TaskCreateDTO();
         testTask2.setTitle("TaskName1111");
         testTask2.setAssigneeId(testUser.getId());
-        testTask2.setStatus(testStatus.getSlug());
-        testTask2.setLabelsId(List.of(testLabel2.getId()));
+        testTask2.setStatus(testStatus2.getSlug());
+        testTask2.setTaskLabelIds(Set.of(testLabel2.getId(), testLabel3.getId()));
 
         var token2 = jwt().jwt(builder -> builder.subject(testUser2.getEmail()));
 
@@ -187,10 +191,11 @@ public class TaskControllerTests {
         assertThat(taskRepository.findById(id)).isPresent();
 
         var taskFromRepo = taskRepository.findById(id).get();
-
+        Set<Label> labels = taskFromRepo.getLabels();
         assertThat(taskFromRepo).isNotNull();
         assertThat(taskFromRepo.getName()).isEqualTo(testTask2.getTitle());
-
+        assertThat(taskFromRepo.getAssignee().equals(testUser)).isTrue();
+        assertThat(labels.size() == 2).isTrue();
     }
 
     @Test
@@ -222,5 +227,6 @@ public class TaskControllerTests {
                 .with(token);
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
+        Assertions.assertThat(taskRepository.existsById(testTask.getId())).isFalse();
     }
 }

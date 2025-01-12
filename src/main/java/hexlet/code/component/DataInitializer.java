@@ -5,8 +5,6 @@ import hexlet.code.model.Label;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
-import hexlet.code.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -17,16 +15,8 @@ import lombok.AllArgsConstructor;
 @Component
 @AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
-
-    @Autowired
-    private final UserRepository userRepository;
-
-    @Autowired
     private final TaskStatusRepository statusRepository;
-    @Autowired
     private final LabelRepository labelRepository;
-
-    @Autowired
     private final CustomUserDetailsService userService;
 
     @Override
@@ -34,6 +24,8 @@ public class DataInitializer implements ApplicationRunner {
         var email = "hexlet@example.com";
         var userData = new User();
         userData.setEmail(email);
+        userData.setFirstName("Admin");
+        userData.setLastName("Admin");
         userData.setPasswordDigest("qwerty");
         userService.createUser(userData);
 
@@ -69,6 +61,5 @@ public class DataInitializer implements ApplicationRunner {
         Label label2 = new Label();
         label2.setName("bug");
         labelRepository.save(label2);
-
     }
 }
